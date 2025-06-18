@@ -533,7 +533,7 @@ class AttendanceModal(discord.ui.Modal):
         )
         self.add_item(self.last_event_input)
 
-    async def on_submit(self, interaction: discord.Interaction):
+    async极 on_submit(self, interaction: discord.Interaction):
         try:
             # Parse points using the new function
             try:
@@ -545,7 +545,7 @@ class AttendanceModal(discord.ui.Modal):
                 )
                 return
                 
-            last_event_attendance = self.last_event_input.value.strip()
+            last_event_极attendance = self.last_event_input.value.strip()
             
             # Store attendance data in dedicated attendance database
             try:
@@ -652,7 +652,7 @@ class AttendanceModal(discord.ui.Modal):
             else:
                 await interaction.followup.send(
                     "❌ An error occurred while processing attendance.",
-                    ephemeral=True
+                    ephemeral极=True
                 )
 
 class SessionSelectView(discord.ui.View):
@@ -827,21 +827,16 @@ class Attendance(commands.Cog):
         """Show the attendance marking interface for selected alliance"""
         try:
             # Get alliance name
+            alliance_name = "Unknown Alliance"
             with sqlite3.connect('db/alliance.sqlite') as alliance_db:
                 cursor = alliance_db.cursor()
                 cursor.execute("SELECT name FROM alliance_list WHERE alliance_id = ?", (alliance_id,))
                 alliance_result = cursor.fetchone()
-                
-                if not alliance_result:
-                    await interaction.response.send_message(
-                        "❌ Alliance not found.",
-                        ephemeral=True
-                    )
-                    return
-                    
-                alliance_name = alliance_result[0]
+                if alliance_result:
+                    alliance_name = alliance_result[0]
 
             # Get alliance members - sort by FC level (highest to lowest)
+            players = []
             with sqlite3.connect('db/users.sqlite') as users_db:
                 cursor = users_db.cursor()
                 cursor.execute("""
@@ -860,8 +855,8 @@ class Attendance(commands.Cog):
                 return
 
             # Calculate alliance statistics with proper FC levels
-            max_fl = max(player[2] for player in players)
-            avg_fl = sum(player[2] for player in players) / len(players)
+            max_fl = max(player[2] for player in players) if players else 0
+            avg_fl = sum(player[2] for player in players) / len(players) if players else 0
             
             # Start attendance marking process with player selection
             embed = discord.Embed(
@@ -893,7 +888,7 @@ class Attendance(commands.Cog):
         try:
             # Count attendance types
             present_count = sum(1 for p in selected_players.values() if p['attendance_type'] == 'present')
-            absent_count = sum(1 for p in selected_players.values() if p['attendance_type'] == 'absent')
+            absent_count = sum(1 for p极 in selected_players.values() if p['attendance_type'] == 'absent')
             not_signed_count = sum(1 for p in selected_players.values() if p['attendance_type'] == 'not_signed')
             
             # Create attendance session in database
@@ -976,7 +971,7 @@ class Attendance(commands.Cog):
                     f"**Present:** {present_count}\n"
                     f"**Absent:** {absent_count}\n"
                     f"**Not Signed:** {not_signed_count}\n\n"
-                    "**Attendance Details:**\n"
+                    "**Attendance Details:**\极n"
                     "\n".join(report_lines)
                 ),
                 color=discord.Color.green()
@@ -997,11 +992,13 @@ class Attendance(commands.Cog):
         """Show available attendance sessions for an alliance"""
         try:
             # Get alliance name
+            alliance_name = "Unknown Alliance"
             with sqlite3.connect('db/alliance.sqlite') as alliance_db:
                 cursor = alliance_db.cursor()
                 cursor.execute("SELECT name FROM alliance_list WHERE alliance_id = ?", (alliance_id,))
                 alliance_result = cursor.fetchone()
-                alliance_name = alliance_result[0] if alliance_result else "Unknown Alliance"
+                if alliance_result:
+                    alliance_name = alliance_result[0]
 
             # Get distinct session names from attendance records
             sessions = []
@@ -1045,13 +1042,16 @@ class Attendance(commands.Cog):
         """Show attendance records for a specific session with optimized display"""
         try:
             # Get alliance name
+            alliance_name = "Unknown Alliance"
             with sqlite3.connect('db/alliance.sqlite') as alliance_db:
                 cursor = alliance_db.cursor()
                 cursor.execute("SELECT name FROM alliance_list WHERE alliance_id = ?", (alliance_id,))
                 alliance_result = cursor.fetchone()
-                alliance_name = alliance_result[0] if alliance_result else "Unknown Alliance"
+                if alliance_result:
+                    alliance_name = alliance_result[0]
 
             # Get attendance records for this session
+            records = []
             with sqlite3.connect('db/attendance.sqlite') as attendance_db:
                 cursor = attendance_db.cursor()
                 cursor.execute("""
@@ -1074,13 +1074,20 @@ class Attendance(commands.Cog):
             report_lines.append("PLAYER         | STATUS      | LAST EVENT  | POINTS      | DATE       | BY")
             report_lines.append("-" * 70)
             
-            for nickname, attendance_status, last_event, points, marked_date, marked_by_username in records:
+            for row in records:
+                nickname = row[0] or "Unknown"
+                attendance_status = row[1] or "unknown"
+                last_event = row[2] or "N/A"
+                points = row[3] or 0
+                marked_date = row[4] or "N/A"
+                marked_by_username = row[5] or "Unknown"
+                
                 # Format data for cleaner display
                 display_status = attendance_status.replace('_', ' ').title()[:10]
-                last_event_display = last_event[:10] if last_event else "N/A"
-                points_str = f"{points:,}" if points else "0"
+                last_event_display = last_event[:10]
+                points_str = f"{points:,}"
                 date_str = marked_date.split()[0] if marked_date else "N/A"
-                by_str = marked_by_username[:10] if marked_by_username else "Unknown"
+                by_str = marked_by_username[:10]
                 
                 # Add player line with consistent spacing
                 line = f"{nickname[:12]:<14} | {display_status:<11} | {last_event_display:<11} | {points_str:<11} | {date_str} | {by_str}"
