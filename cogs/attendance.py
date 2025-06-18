@@ -533,7 +533,7 @@ class AttendanceModal(discord.ui.Modal):
         )
         self.add_item(self.last_event_input)
 
-    async极 on_submit(self, interaction: discord.Interaction):
+    async def on_submit(self, interaction: discord.Interaction):
         try:
             # Parse points using the new function
             try:
@@ -545,7 +545,7 @@ class AttendanceModal(discord.ui.Modal):
                 )
                 return
                 
-            last_event_极attendance = self.last_event_input.value.strip()
+            last_event_attendance = self.last_event_input.value.strip()
             
             # Store attendance data in dedicated attendance database
             try:
@@ -652,7 +652,7 @@ class AttendanceModal(discord.ui.Modal):
             else:
                 await interaction.followup.send(
                     "❌ An error occurred while processing attendance.",
-                    ephemeral极=True
+                    ephemeral=True
                 )
 
 class SessionSelectView(discord.ui.View):
@@ -888,7 +888,7 @@ class Attendance(commands.Cog):
         try:
             # Count attendance types
             present_count = sum(1 for p in selected_players.values() if p['attendance_type'] == 'present')
-            absent_count = sum(1 for p极 in selected_players.values() if p['attendance_type'] == 'absent')
+            absent_count = sum(1 for p in selected_players.values() if p['attendance_type'] == 'absent')
             not_signed_count = sum(1 for p in selected_players.values() if p['attendance_type'] == 'not_signed')
             
             # Create attendance session in database
@@ -971,7 +971,7 @@ class Attendance(commands.Cog):
                     f"**Present:** {present_count}\n"
                     f"**Absent:** {absent_count}\n"
                     f"**Not Signed:** {not_signed_count}\n\n"
-                    "**Attendance Details:**\极n"
+                    "**Attendance Details:**\n"
                     "\n".join(report_lines)
                 ),
                 color=discord.Color.green()
