@@ -989,56 +989,56 @@ class Attendance(commands.Cog):
             )
 
     async def show_session_selection(self, interaction: discord.Interaction, alliance_id: int):
-    """Show available attendance sessions for an alliance"""
-    try:
-        # Get alliance name
-        alliance_name = "Unknown Alliance"
-        with sqlite3.connect('db/alliance.sqlite') as alliance_db:
-            cursor = alliance_db.cursor()
-            cursor.execute("SELECT name FROM alliance_list WHERE alliance_id = ?", (alliance_id,))
-            alliance_result = cursor.fetchone()
-            if alliance_result:
-                alliance_name = alliance_result[0]
-
-        # Get distinct session names from attendance records - FIXED HERE
-        sessions = []
-        with sqlite3.connect('db/attendance.sqlite') as attendance_db:
-            cursor = attendance_db.cursor()
-            cursor.execute("""
-                SELECT DISTINCT session_name 
-                FROM attendance_records
-                WHERE alliance_id = ? 
-                AND session_name IS NOT NULL  -- Ensure we don't get NULL values
-                AND TRIM(session_name) <> ''  -- Ensure we don't get empty strings
-                ORDER BY marked_date DESC
-            """, (alliance_id,))
-            sessions = [row[0] for row in cursor.fetchall() if row[0]]  # Filter out empty values
-
-        if not sessions:
-            await interaction.response.edit_message(
-                content=f"❌ No attendance sessions found for {alliance_name}.",
-                embed=None,
-                view=None
-            )
-            return
-
-        # Create session selection view
-        view = SessionSelectView(sessions, alliance_id, self)
-        
-        embed = discord.Embed(
-            title=f"📋 Attendance Sessions - {alliance_name}",
-            description="Please select a session to view attendance records:",
-            color=discord.Color.blue()
-        )
-        
-        await interaction.response.edit_message(embed=embed, view=view)
-
-    except Exception as e:
-        print(f"Error showing session selection: {e}")
-        await interaction.response.send_message(
-            "❌ An error occurred while loading sessions.",
-            ephemeral=True
-        )
+				    """Show available attendance sessions for an alliance"""
+				    try:
+				        # Get alliance name
+				        alliance_name = "Unknown Alliance"
+				        with sqlite3.connect('db/alliance.sqlite') as alliance_db:
+				            cursor = alliance_db.cursor()
+				            cursor.execute("SELECT name FROM alliance_list WHERE alliance_id = ?", (alliance_id,))
+				            alliance_result = cursor.fetchone()
+				            if alliance_result:
+				                alliance_name = alliance_result[0]
+				
+				        # Get distinct session names from attendance records - FIXED HERE
+				        sessions = []
+				        with sqlite3.connect('db/attendance.sqlite') as attendance_db:
+				            cursor = attendance_db.cursor()
+				            cursor.execute("""
+				                SELECT DISTINCT session_name 
+				                FROM attendance_records
+				                WHERE alliance_id = ? 
+				                AND session_name IS NOT NULL  -- Ensure we don't get NULL values
+				                AND TRIM(session_name) <> ''  -- Ensure we don't get empty strings
+				                ORDER BY marked_date DESC
+				            """, (alliance_id,))
+				            sessions = [row[0] for row in cursor.fetchall() if row[0]]  # Filter out empty values
+				
+				        if not sessions:
+				            await interaction.response.edit_message(
+				                content=f"❌ No attendance sessions found for {alliance_name}.",
+				                embed=None,
+				                view=None
+				            )
+				            return
+				
+				        # Create session selection view
+				        view = SessionSelectView(sessions, alliance_id, self)
+				        
+				        embed = discord.Embed(
+				            title=f"📋 Attendance Sessions - {alliance_name}",
+				            description="Please select a session to view attendance records:",
+				            color=discord.Color.blue()
+				        )
+				        
+				        await interaction.response.edit_message(embed=embed, view=view)
+				
+				    except Exception as e:
+				        print(f"Error showing session selection: {e}")
+				        await interaction.response.send_message(
+				            "❌ An error occurred while loading sessions.",
+				            ephemeral=True
+				        )
             
     async def show_attendance_report(self, interaction: discord.Interaction, alliance_id: int, session_name: str):
         """Show attendance records for a specific session with optimized display"""
