@@ -9,6 +9,7 @@ import os
 import plotly.graph_objects as go
 import pandas as pd
 import uuid
+from io import BytesIO
 
 # FC Level mapping for furnace levels
 FC_LEVEL_MAPPING = {
@@ -1117,12 +1118,13 @@ class Attendance(commands.Cog):
                     height=600 + len(records) * 30  # Dynamic height based on rows
                 )
                 
-                # Generate unique filename
-                filename = f"attendance_{uuid.uuid4().hex}.png"
-                fig.write_image(filename, scale=2)
+                # Use BytesIO to avoid file locking issues
+                img_buffer = BytesIO()
+                fig.write_image(img_buffer, format='png', scale=2)
+                img_buffer.seek(0)  # Rewind buffer to beginning
                 
                 # Create Discord file
-                file = discord.File(filename, filename="attendance_report.png")
+                file = discord.File(img_buffer, filename="attendance_report.png")
                 
                 # Create embed
                 embed = discord.Embed(
@@ -1158,9 +1160,6 @@ class Attendance(commands.Cog):
                     view=None,
                     attachments=[file]
                 )
-                
-                # Clean up temporary file
-                os.remove(filename)
                 
             except ImportError:
                 # Fallback to text if Plotly not installed
