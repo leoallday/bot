@@ -10,6 +10,16 @@ import queue
 import re
 from datetime import datetime
 
+if sys.platform == "win32":
+    try:
+        os.system("chcp 65001 >nul 2>&1")
+        if hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        if hasattr(sys.stderr, 'reconfigure'):
+            sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
 class BotMonitor:
     def __init__(self):
         self.process = None
@@ -34,7 +44,11 @@ class BotMonitor:
             for line in iter(pipe.readline, b''):
                 if line:
                     decoded_line = line.decode('utf-8', errors='replace').strip()
-                    print(decoded_line)
+                    try:
+                        print(decoded_line)
+                    except UnicodeEncodeError:
+                        safe_line = decoded_line.encode('ascii', errors='replace').decode('ascii')
+                        print(safe_line)
                     output_queue.put(decoded_line)
         except Exception as e:
             self.log(f"Output monitoring error: {e}")
@@ -50,13 +64,17 @@ class BotMonitor:
         
         try:
             args = [sys.executable, "main.py"] + sys.argv[1:]
-            
+
+            env = os.environ.copy()
+            env['PYTHONIOENCODING'] = 'utf-8'
+
             self.process = subprocess.Popen(
                 args,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 bufsize=1,
-                universal_newlines=False
+                universal_newlines=False,
+                env=env
             )
             
             self.log(f"Bot started with PID: {self.process.pid}")

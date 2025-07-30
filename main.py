@@ -251,13 +251,13 @@ def check_and_install_requirements():
                 
                 
                 subprocess.check_call(cmd, timeout=1200, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                print(f"✓ {package} installed successfully")
+                print(f"[OK] {package} installed successfully")
                 
             except Exception as e:
                 print(f"✗ Failed to install {package}: {e}")
                 return False
     
-    print("✓ All requirements satisfied")
+    print("[OK] All requirements satisfied")
     return True
 
 def setup_dependencies():
@@ -284,7 +284,7 @@ if not setup_dependencies():
 try:
     from colorama import Fore, Style, init
     import discord
-    print("✓ All core imports successful")
+    print("[OK] All core imports successful")
 except ImportError as e:
     print(f"Import failed even after dependency setup: {e}")
     print("Please restart the script or install dependencies manually")
@@ -314,7 +314,7 @@ try: # Clean up old ddddocr dependency if present
             try:
                 subprocess.check_call([sys.executable, "-m", "pip", "uninstall", package, "-y"], 
                                     timeout=300, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                print(f"✓ Successfully removed {package}")
+                print(f"[OK] Successfully removed {package}")
             except Exception as e:
                 print(f"Warning: Failed to uninstall {package}: {e}")
                 print(f"You may want to manually uninstall it with: pip uninstall {package}")
@@ -616,7 +616,7 @@ if __name__ == "__main__":
                                     try:
                                         subprocess.check_call([sys.executable, "-m", "pip", "uninstall", package, "-y"], 
                                                             timeout=300, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                                        print(Fore.GREEN + f"✓ Removed {package}" + Style.RESET_ALL)
+                                        print(Fore.GREEN + f"[OK] Removed {package}" + Style.RESET_ALL)
                                     except Exception as e:
                                         print(Fore.YELLOW + f"Warning: Could not remove {package}: {e}" + Style.RESET_ALL)
                         except Exception as e:
@@ -850,7 +850,7 @@ if __name__ == "__main__":
                             print(f"⚠️ {len(retry_failed)} cogs still failed to load: {', '.join(retry_failed)}")
                             print("Bot will continue with reduced functionality.")
                         else:
-                            print("✓ All cogs recovered successfully!")
+                            print("[OK] All cogs recovered successfully!")
                             
                     else:
                         print(f"Failed to download recovery files: HTTP {download_resp.status_code}")

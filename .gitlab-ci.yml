@@ -149,8 +149,8 @@ test-bot-docker-update:
         fi
         
         # Check for success indicators
-        if grep -q "✓ All requirements satisfied" $LOG_FILE && \
-           grep -q "✓ All core imports successful" $LOG_FILE && \
+        if grep -q "\\[OK\\] All requirements satisfied" $LOG_FILE && \
+           grep -q "\\[OK\\] All core imports successful" $LOG_FILE && \
            grep -q "Logged in as" $LOG_FILE && \
            grep -q "Activation messages sent to admin user." $LOG_FILE; then
           echo "Bot initialization successful!"
@@ -385,8 +385,8 @@ test-bot-docker-no-update:
         
         # Check for success indicators
         if grep -q "Update check skipped due to --no-update flag" $LOG_FILE && \
-           grep -q "✓ All requirements satisfied" $LOG_FILE && \
-           grep -q "✓ All core imports successful" $LOG_FILE && \
+           grep -q "\\[OK\\] All requirements satisfied" $LOG_FILE && \
+           grep -q "\\[OK\\] All core imports successful" $LOG_FILE && \
            grep -q "Logged in as" $LOG_FILE && \
            grep -q "Activation messages sent to admin user." $LOG_FILE; then
           echo "Bot initialization successful!"
@@ -461,8 +461,8 @@ test-bot-linux-no-update:
         fi
         
         if grep -q "Update check skipped due to --no-update flag" bot_output.log && \
-           grep -q "✓ All requirements satisfied" bot_output.log && \
-           grep -q "✓ All core imports successful" bot_output.log && \
+           grep -q "\\[OK\\] All requirements satisfied" bot_output.log && \
+           grep -q "\\[OK\\] All core imports successful" bot_output.log && \
            grep -q "Logged in as" bot_output.log && \
            grep -q "Activation messages sent to admin user." bot_output.log; then
           echo "Bot initialization successful!"
